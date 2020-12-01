@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css"  href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.7/dist/semantic.css">
+    <script  src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.7/dist/semantic.js">  </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-xmlrpc/0.4.3/jquery.xmlrpc.js"> </script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <link href="https://vjs.zencdn.net/7.8.4/video-js.css" rel="stylesheet" />
+    <script src="http://vjs.zencdn.net/7.8.4/video.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-youtube/2.6.1/Youtube.min.js"></script>
+
+
+
+
+
+
+    <script>
+
+        function updateVideostable(){
+            $.ajax({
+                url: '/API/videoList/',
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    $('#videosTable > tbody:last-child').empty()
+                    data["videos"].forEach(v => {
+                        console.log(v["video_id"]+" "+v["description"])
+                        $('#videosTable > tbody:last-child').
+                            append('<tr> <td>'+ v["video_id"]+'</td><td>' +v["description"]+'</td></tr>');
+                    });
+                }
+            });
+
+        }
+        function addNewVideo(url, description){
+            requestData = {"description": description, 'url': url}
+            $.ajax({
+                url: '/API/videoList/',
+                type: "POST",
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(requestData),
+                success: function(data){
+                  console.log("resppnse for video creation"+data)
+                  console.log(data)
+                  updateVideostable()
+                }
+            });
+        }
+        $(document).ready(function(){
+          updateVideostable()
+          $("#buttonUpdateVideotable").click(function(){
+              updateVideostable()
+            })
+                     
+          
+          
+            $("#buttonAddVideo").click(function(){
+              newVideoURl = $("#newVideoURL").val()
+              newVideoDESC = $("#newVideoDescription").val()
+              addNewVideo(newVideoURl, newVideoDESC)
+               
+              
+
+            })
+
+
+            $("#buttonGoVideoPage").click(function(){
+                videoID = String($("#SelectVideoID").val())
+                window.location.href = videoID;
+                
+            })
+
+        });
+
+    </script>
+
+  </head>
+  <body>
+    <h3>Video List</h3>
+    <table class="ui celled table selectable" id="videosTable" >
+      <thead>
+        <tr>
+          <th>ID</th>  <th>Description</th>   <th>QA</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    <button class="ui button" id="buttonUpdateVideotable">
+      Update List
+    </button>
+
+    <h3>Add a new Video</h3>
+    <div class="ui input">
+      <input type="text" placeholder="Video URL" id="newVideoURL">
+    </div>
+    <div class="ui input">
+      <input type="text" placeholder="Video Description" id="newVideoDescription">
+    </div>
+    <button class="ui button" id="buttonAddVideo">
+      Add
+    </button>
+
+    <h3>Go to video page</h3>
+    <div class="ui input">
+      <input type="text" placeholder="Video id" id="SelectVideoID">
+    </div>
+    <button class="ui button" id="buttonGoVideoPage">
+      Go
+    </button>
+    <br>
+
+  </body>
+
+</html>
