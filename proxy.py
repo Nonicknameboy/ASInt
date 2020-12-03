@@ -31,7 +31,10 @@ def createNewVideo():
     
 @app.route("/API/videoList/", methods=['GET'])
 def returnsVideosJSON():
-    return {"videos": listVideosDICT()}
+    videos = listVideosDICT()
+    for v in videos:
+        v['QA'] = getNumberOfQuestionsByVideo(v['video_id'])
+    return {"videos": videos}
 
 @app.route("/API/<int:id>/", methods=['GET'])
 def goToVideoPage(id):
@@ -53,6 +56,28 @@ def createNewQuestion(id):
     try:
         print(j["description"])
         ret = newQuestion(j["time"], j['description'],id)
+    except:
+        abort(400)
+        #the arguments were incorrect
+    if ret:
+        return {"id": ret}
+    else:
+        abort(409)
+    #if there is an erro return ERROR 409
+    
+@app.route("/API/<int:Vid>/Questions/<int:Qid>/Answers/", methods=['GET'])
+def getQuestionAnswers(Vid,Qid):
+    A = getAnswersfromQuestionDICT(Qid)
+    return {"answers": A}
+
+@app.route("/API/<int:Vid>/Questions/<int:Qid>/Answers/", methods=['POST'])
+def createNewAnswer(Vid,Qid):
+    j = request.get_json()
+    print (type(j))
+    ret = False
+    try:
+        print(j["description"])
+        ret = newAnswer(j["description"], Qid)
     except:
         abort(400)
         #the arguments were incorrect

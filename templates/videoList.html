@@ -28,9 +28,9 @@
                     console.log(data);
                     $('#videosTable > tbody:last-child').empty()
                     data["videos"].forEach(v => {
-                        console.log(v["video_id"]+" "+v["description"])
+                        console.log(v["video_id"]+" "+v["description"]+" "+v["QA"])
                         $('#videosTable > tbody:last-child').
-                            append('<tr> <td>'+ v["video_id"]+'</td><td>' +v["description"]+'</td></tr>');
+                            append('<tr> <td><a href='+ v["video_id"]+'>' +v["description"]+'</a></td><td>' +v["QA"]+'</td></tr>');
                     });
                 }
             });
@@ -74,6 +74,13 @@
                 window.location.href = videoID;
                 
             })
+            
+            $("#videosTable tr").click(function() {
+                var href = $(this).find("a").attr("href");
+                if(href) {
+                    window.location = href;
+                }
+            });
 
         });
 
@@ -85,7 +92,7 @@
     <table class="ui celled table selectable" id="videosTable" >
       <thead>
         <tr>
-          <th>ID</th>  <th>Description</th>   <th>QA</th>
+          <th>Description</th>   <th>QA</th>
         </tr>
       </thead>
       <tbody>

@@ -1,4 +1,5 @@
 
 from Video_DB import *
 
-{"videos": listVideosDICT()}
+d = getAnswersfromQuestionDICT(1)
+print(d)
