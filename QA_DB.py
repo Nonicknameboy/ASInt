@@ -28,9 +28,9 @@ Base = declarative_base()
 #Declaration of data
 
 class Question(Base):
-    __tablename__ = 'Question'
-    video_id = Column(Integer, primary_key=True)    
+    __tablename__ = 'Question'  
     id = Column(Integer, primary_key=True)
+    video_id = Column(Integer, )  
     description = Column(String)
     time = Column(Integer)
     
@@ -104,7 +104,7 @@ def getQuestionsfromVideoDICT(videoID):
         ret_list.append(b.to_dictionary())
     return ret_list
 
-def newQuestion(time , description,vID):
+def newQuestion(time , description, vID):
     q = Question(description = description, time = time, video_id = vID)
     try:
         session.add(q)

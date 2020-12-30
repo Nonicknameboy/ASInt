@@ -29,7 +29,7 @@ class YTVideo(Base):
     url = Column(String)
     views = Column(Integer, default = 0)
     
-    questions = relationship("Question", back_populates = "YTVideo")
+    #questions = relationship("Question", back_populates = "YTVideo")
     
     def __repr__(self):
         return "<YouTubeVideo (id=%d Description=%s, URL=%s, Views=%s>" % (

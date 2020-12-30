@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, url_for,redirect
 from enum import Enum
 from flaskXMLRPC import XMLRPCHandler
 from Video_DB import *
+from QA_DB import *
+from User_DB import *
 
 app = Flask(__name__)
 handler = XMLRPCHandler('api')

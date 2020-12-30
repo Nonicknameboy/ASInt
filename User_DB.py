@@ -1,7 +1,7 @@
 from xmlrpc.client import Boolean
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy import Column, Integer, String, Date, Boolean
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, scoped_session
 
