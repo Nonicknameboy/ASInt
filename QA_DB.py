@@ -30,7 +30,7 @@ Base = declarative_base()
 class Question(Base):
     __tablename__ = 'Question'  
     id = Column(Integer, primary_key=True)
-    video_id = Column(Integer, )  
+    video_id = Column(Integer)  
     description = Column(String)
     time = Column(Integer)
     
