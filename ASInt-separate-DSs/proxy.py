@@ -1,10 +1,12 @@
 import os
 from flask import Flask, render_template, request, url_for,redirect
+from flask_dance.consumer import OAuth2ConsumerBlueprint
 from enum import Enum
 from flaskXMLRPC import XMLRPCHandler
 from Video_DB import *
 from QA_DB import *
 from User_DB import *
+from flask import session
 
 app = Flask(__name__)
 handler = XMLRPCHandler('api')

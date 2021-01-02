@@ -4,6 +4,8 @@
 {% if loggedIn %}
 User logged in
 <br>
+<a href="{{ url_for("index") }}"> VQA</a>
+<br>
 <a href="{{ url_for("private_page") }}"> Private part of the site (needs auth)</a>
 <br>
 <a href="{{ url_for("logout") }}"> Logout</a>
