@@ -45,8 +45,9 @@ app.register_blueprint(fenix_blueprint)
 
 
 
-@app.route('/')
-def home_page():
+
+def home_pageUM():
+    app.run(debug=True)
     # The access token is generated everytime the user authenticates into FENIX
     print(fenix_blueprint.session.authorized)
     print("Access token: "+ str(fenix_blueprint.session.access_token))
@@ -54,8 +55,8 @@ def home_page():
 
 
 
-@app.route('/logout')
-def logout():
+
+def logoutUM():
     # this clears all server information about the access token of this connection
     res = str(session.items())
     print(res)
@@ -67,8 +68,8 @@ def logout():
 
     
 
-@app.route('/private')
-def private_page():
+
+def private_pageUM():
     #this page can only be accessed by a authenticated user
 
     # verification of the user is  logged in

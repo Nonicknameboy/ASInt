@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css"  href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.7/dist/semantic.css">
+    <script  src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.7/dist/semantic.js">  </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-xmlrpc/0.4.3/jquery.xmlrpc.js"> </script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <link href="https://vjs.zencdn.net/7.8.4/video-js.css" rel="stylesheet" />
+    <script src="http://vjs.zencdn.net/7.8.4/video.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-youtube/2.6.1/Youtube.min.js"></script>
+
+
+
+
+
+
+    <script>
+
+        function updateQuestionstable(){
+            videoID = {{videoID}}
+            $.ajax({
+                url: "/API/"+videoID+"/Questions",
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    $('#questionsTable > tbody:last-child').empty()
+                    data["questions"].forEach(q => {
+                        console.log(q["question_id"]+" "+q["description"])
+                        $('#questionsTable > tbody:last-child').
+                            append('<tr> <td><a>'+ q["question_id"]+'</a></td> <td>'+ q["time"]+'</td><td>' +q["description"]+'</td></tr>');
+                    });
+                }
+            });
+
+        }
+        
+        function addNewQuestion(time, description){
+            requestData = {"description": description, 'time': time}
+            videoID = {{videoID}}
+            $.ajax({
+                url: "/API/"+videoID+"/Questions/",
+                type: "POST",
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(requestData),
+                success: function(data){
+                  console.log("question "+data)
+                  console.log(data)
+                  updateQuestionstable()
+                }
+            });
+        } 
+        
+        function addAnswer(qID,text){
+            requestData = {"description": text, "question_ID": qID}
+            videoID = {{videoID}}
+            $.ajax({
+                url: "/API/"+videoID+"/Questions/"+qID+"/Answers/",
+                type: "POST",
+                dataType: "json",
+                contentType: 'application/json',
+                data: JSON.stringify(requestData),
+                success: function(data){
+                  console.log("answer"+data)
+                  console.log(data)
+                  updateAnswerstable(qID)
+                }
+            })
+        }
+        
+        function updateAnswerstable(qID){
+            videoID = {{videoID}}
+            $.ajax({
+                url: "/API/"+videoID+"/Questions/"+qID+"/Answers/",
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    $('#answersTable > tbody:last-child').empty()
+                    data["answers"].forEach(a => {
+                        console.log(a["description"])
+                        $('#answersTable > tbody:last-child').
+                            append('<tr> <td>'+a["description"]+'</td></tr>');
+                    });
+                }
+            });
+        }
+        
+      
+
+        $(document).ready(function(){
+        
+            qflag = 0;
+            aflag = 0;
+            questionID = null;
+        
+            updateQuestionstable()
+            
+            src = "{{src}}";
+            var vPlayer = videojs('videoPlayer');
+            vPlayer.src({ "type": "video/youtube", "src": src});
+            vPlayer.play()
+            $("#newQuestionDescription").hide()
+            $("#newAnswerDescription").hide()
+
+            $("#buttonVideoPause").click(function(){
+                vPlayer.pause()
+                var pauseTime = vPlayer.currentTime()
+                console.log(pauseTime)
+                $("#resumetime").val(pauseTime)
+
+             })
+             
+            $("#buttonVideoResume").click(function(){
+                vPlayer.currentTime( parseFloat($("#resumetime").val()))
+                vPlayer.play()
+            })
+            
+            $("#buttonAddQuestion").click(function(){
+                if(qflag == 0){
+                    $("#newQuestionDescription").show()
+                    vPlayer.pause()
+                    var pauseTime = vPlayer.currentTime()
+                    console.log(pauseTime)
+                    $("#resumetime").val(pauseTime)
+                    qflag = 1;
+                }
+                else if (qflag == 1){
+                    desc = $("#newQuestionDescription").val()
+                    time = $("#resumetime").val()
+                    addNewQuestion(time,desc)
+                    $("#newQuestionDescription").hide()
+                    vPlayer.currentTime( parseFloat($("#resumetime").val()))
+                    vPlayer.play() 
+                    qflag = 0;               
+                }
+             })
+             
+             $("#buttonSelectQuestion").click(function(){
+                 questionID = $("#questionID").val()
+                 updateAnswerstable(questionID)
+                 $("#showedQuestion").html(questionID)
+            })
+            
+            $("#questionsTable tr").click(function() {
+                value = $(this).find("a").html();
+                updateAnswerstable(value)
+                $("#showedQuestion").html(value)
+            });
+            
+            $("#buttonAddAnswer").click(function(){
+                if(aflag == 0){
+                    $("#newAnswerDescription").show()
+                    aflag = 1;
+                }
+                else if (aflag == 1){
+                    desc = $("#newAnswerDescription").val()
+                    addAnswer(questionID,desc)
+                    $("#newAnswerDescription").hide()
+                    aflag = 0;
+                    updateAnswerstable(questionID)            
+                }
+             })
+        });
+
+    </script>
+
+  </head>
+  <body>
+    <h3>{{title}}</h3>
+    <video  id="videoPlayer" controls 
+            class="video-js vjs-default-skin"
+            width="640"
+            data-setup='{ "autoplay": true, "preload": "auto", "techOrder": ["youtube"], "sources": [{ "type": "video/youtube" }'
+    >
+    </video>
+    <h3>Control Video</h3>
+    <button class="ui button" id="buttonVideoPause">
+     PAUSE Video
+    </button> 
+    <div class="ui input focus" >
+      <input type="text" id="resumetime">
+    </div>
+    <button class="ui button" id="buttonVideoResume">
+      RESUME Video
+    </button>
+    
+    <h3>Questions</h3>
+    <table class="ui celled table selectable" id="questionsTable" >
+      <thead>
+        <tr>
+          <th>ID</th>  <th>Time</th>  <th>Question</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    
+    <h3>Add a new Question</h3>
+    <div class="ui input">
+      <input type="text" placeholder="Question" id="newQuestionDescription">
+    </div>
+    <button class="ui button" id="buttonAddQuestion">
+      Add new Question
+    </button>
+    
+    <h3>Select a question</h3>
+    <div class="ui input">
+      <input type="text" placeholder="questionID" id="questionID">
+    </div>
+    <button class="ui button" id="buttonSelectQuestion">
+      Select
+    </button>
+    
+    <h3>Answers to question</h3>
+    <div class="ui segment"id="showedQuestion">
+    </div>
+    <table class="ui celled table selectable" id="answersTable" >
+      <thead>
+        <tr>
+          <th>Answer</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    
+    <h3>New Answer</h3>
+    <div class="ui input">
+      <input type="text" placeholder="Answer" id="newAnswerDescription">
+    </div>
+    <button class="ui button" id="buttonAddAnswer">
+      Add
+    </button>
+
+  </body>
+
+</html>
