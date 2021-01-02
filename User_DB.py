@@ -22,6 +22,7 @@ engine = create_engine('sqlite:///%s'%(DATABASE_FILE), echo=False) #echo = True 
 
 Base = declarative_base()
 
+adminIDs = [ist14028, ist425426, ist425484]
 
 # daqui para cima é igual? (menos o DATABASE_FILE) ---------------------------------------
 
@@ -40,3 +41,15 @@ class User(Base):
     def to_dictionary(self):
         return {"user_id": self.user_id, "name": self.name, "admin": self.admin}
     
+
+def newUser(name,uID):
+    ad = uID in adminIDs
+    u = User(name = name, user_id = uID, admin=ad)
+    try:
+        session.add(u)
+        session.commit()
+        print(u.user_id)
+        session.close()
+        return u.user_id
+    except:
+        return None
