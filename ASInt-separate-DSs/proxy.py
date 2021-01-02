@@ -73,7 +73,6 @@ def logout():
 @app.route('/private')
 def private_page():
     #this page can only be accessed by a authenticated user
-
     # verification of the user is  logged in
     if fenix_blueprint.session.authorized == False:
         #if not logged in browser is redirected to login page (in this case FENIX handled the login)
@@ -90,7 +89,16 @@ def private_page():
 
 @app.route("/API/")
 def index():
-    return render_template('videoList.html')
+    if fenix_blueprint.session.authorized == False:
+        #if not logged in browser is redirected to login page (in this case FENIX handled the login)
+        return redirect(url_for("fenix-example.login"))
+    else:
+        #if the user is authenticated then a request to FENIX is made
+        resp = fenix_blueprint.session.get("/api/fenix/v1/person/")
+        #res contains the responde made to /api/fenix/vi/person (information about current user)
+        data = resp.json() 
+        print(resp.json())
+        return render_template('videoList.html')
 
 @app.route("/API/videoList/", methods=['POST'])
 def createNewVideo():
@@ -99,7 +107,12 @@ def createNewVideo():
     ret = False
     try:
         print(j["description"])
-        ret = newVideo(j["description"], j['url'])
+        #if the user is authenticated then a request to FENIX is made
+        resp = fenix_blueprint.session.get("/api/fenix/v1/person/")
+        #res contains the responde made to /api/fenix/vi/person (information about current user)
+        data = resp.json() 
+        print(resp.json())
+        ret = newVideo(j["description"], j['url'],data['username'])
     except:
         abort(400)
         #the arguments were incorrect
@@ -135,7 +148,10 @@ def createNewQuestion(id):
     ret = False
     try:
         print(j["description"])
-        ret = newQuestion(j["time"], j['description'],id)
+        resp = fenix_blueprint.session.get("/api/fenix/v1/person/")
+        data = resp.json() 
+        print(resp.json())
+        ret = newQuestion(j["time"], j['description'],id,data['username'])
     except:
         abort(400)
         #the arguments were incorrect
@@ -157,7 +173,10 @@ def createNewAnswer(Vid,Qid):
     ret = False
     try:
         print(j["description"])
-        ret = newAnswer(j["description"], Qid)
+        resp = fenix_blueprint.session.get("/api/fenix/v1/person/")
+        data = resp.json() 
+        print(resp.json())
+        ret = newAnswer(j["description"], Qid,data['username'])
     except:
         abort(400)
         #the arguments were incorrect
@@ -166,8 +185,7 @@ def createNewAnswer(Vid,Qid):
     else:
         abort(409)
     #if there is an erro return ERROR 409
-
-
+    
 
 
 if __name__ == "__main__":
