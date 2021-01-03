@@ -28,14 +28,15 @@ class YTVideo(Base):
     description = Column(String)
     url = Column(String)
     views = Column(Integer, default = 0)
+    user= Column(String)
     
     #questions = relationship("Question", back_populates = "YTVideo")
     
     def __repr__(self):
-        return "<YouTubeVideo (id=%d Description=%s, URL=%s, Views=%s>" % (
-                                self.id, self.description, self.url,  self.views)
+        return "<YouTubeVideo (id=%d Description=%s, URL=%s, Views=%s, user=%s>" % (
+                                self.id, self.description, self.url,  self.views, self.user)
     def to_dictionary(self):
-        return {"video_id": self.id, "description": self.description, "url": self.url, "views": self.views}
+        return {"video_id": self.id, "description": self.description, "url": self.url, "views": self.views, "user":self.user}
     
 
 Base.metadata.create_all(engine) #Create tables for the data models
@@ -75,8 +76,8 @@ def newVideoView(id):
     return n
 
 
-def newVideo(description , url):
-    vid = YTVideo(description = description, url = url)
+def newVideo(description , url,user):
+    vid = YTVideo(description = description, url = url, user=user)
     try:
         session.add(vid)
         session.commit()

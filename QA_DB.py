@@ -33,6 +33,7 @@ class Question(Base):
     video_id = Column(Integer)  
     description = Column(String)
     time = Column(Integer)
+    user = Column(String)
     
     #video_id = Column(Integer, ForeignKey('YTVideo.id')) 
     #YTVideo = relationship("YTVideo", back_populates="questions")
@@ -40,25 +41,26 @@ class Question(Base):
     answers = relationship("Answer", back_populates="question")
     
     def __repr__(self):
-        return "<Question (id=%d Description='%s', time='%d', videoID=%d>" % (
-                                self.id, self.description, self.time, self.video_id)
+        return "<Question (id=%d Description='%s', time='%d', videoID=%d, user=%s>" % (
+                                self.id, self.description, self.time, self.video_id, self.user)
     def to_dictionary(self):
-        return {"question_id": self.id, "description": self.description, "time": self.time, "video":self.video_id}
+        return {"question_id": self.id, "description": self.description, "time": self.time, "video":self.video_id, "user":self.user}
     
 
 class Answer(Base):
     __tablename__ = 'Answer'
     id = Column(Integer, primary_key=True)
     description = Column(String)
+    user = Column(String)
     
     question_id = Column(Integer, ForeignKey('Question.id')) 
     question = relationship("Question", back_populates="answers")
     
     def __repr__(self):
-        return "<Answer (id=%d Description='%s', questionID=%d>" % (
-                                self.id, self.description,self.question_id)
+        return "<Answer (id=%d Description='%s', questionID=%d, user=%s>" % (
+                                self.id, self.description,self.question_id, self.user)
     def to_dictionary(self):
-        return {"answer_id": self.id, "description": self.description, "question":self.question_id}
+        return {"answer_id": self.id, "description": self.description, "question":self.question_id, "user":self.user}
     
 
 
@@ -82,8 +84,8 @@ def getAnswersfromQuestionDICT(questionID):
         ret_list.append(a.to_dictionary())
     return ret_list
 
-def newAnswer(description,qID):
-    a = Answer(description = description, question_id = qID)
+def newAnswer(description,qID, user):
+    a = Answer(description = description, question_id = qID, user=user)
     try:
         session.add(a)
         session.commit()
@@ -104,8 +106,18 @@ def getQuestionsfromVideoDICT(videoID):
         ret_list.append(b.to_dictionary())
     return ret_list
 
-def newQuestion(time , description, vID):
-    q = Question(description = description, time = time, video_id = vID)
+def getQuestion(id):
+     q =  session.query(Question).filter(Question.id==id).first()
+     session.close()
+     return q
+
+def getQuestionDICT(id):
+    return getQuestion(id).to_dictionary()
+    
+    
+
+def newQuestion(time , description, vID, user):
+    q = Question(description = description, time = time, video_id = vID, user=user)
     try:
         session.add(q)
         session.commit()

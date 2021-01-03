@@ -84,9 +84,30 @@
                     data["answers"].forEach(a => {
                         console.log(a["description"])
                         $('#answersTable > tbody:last-child').
-                            append('<tr> <td>'+a["description"]+'</td></tr>');
+                            append('<tr> <td>'+a["description"]+'</td><td>'+a["user"]+'</td></tr>');
                     });
                 }
+            });
+        }
+        
+        function getQuestion(qID){
+            $.ajax({
+                url: "/API/"+videoID+"/Questions/"+qID+"/",
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                    $("#ADesc").show()
+                    $("#showedQuestion").show()
+                    $("#QTime").show()
+                    $("#questionTime").show()
+                    $("#QUser").show()
+                    $("#questionUser").show()
+                    question = data["question"];
+                    $("#showedQuestion").html(question["description"]);
+                    $("#questionTime").html(question["time"]);
+                    $("#questionUser").html(question["user"]);
+                    }
             });
         }
         
@@ -106,6 +127,12 @@
             vPlayer.play()
             $("#newQuestionDescription").hide()
             $("#newAnswerDescription").hide()
+            $("QDesc").hide()
+            $("#showedQuestion").hide()
+            $("#QTime").hide()
+            $("#questionTime").hide()
+             $("#QUser").hide()
+            $("#questionUser").hide()
 
             $("#buttonVideoPause").click(function(){
                 vPlayer.pause()
@@ -143,7 +170,7 @@
              $("#buttonSelectQuestion").click(function(){
                  questionID = $("#questionID").val()
                  updateAnswerstable(questionID)
-                 $("#showedQuestion").html(questionID)
+                 getQuestion(questionID)
             })
             
             $("#questionsTable tr").click(function() {
@@ -216,13 +243,19 @@
       Select
     </button>
     
-    <h3>Answers to question</h3>
+    <h3 id = "QDesc">Answers to question</h3>
     <div class="ui segment"id="showedQuestion">
+    </div>
+    <h3 id = "QTime">Time</h3>
+    <div class="ui segment"id="questionTime">
+    </div>
+    <h3 id = "QUser">User</h3>
+    <div class="ui segment"id="questionUser">
     </div>
     <table class="ui celled table selectable" id="answersTable" >
       <thead>
         <tr>
-          <th>Answer</th>
+          <th>Answer</th> <th>UserID</th>
         </tr>
       </thead>
       <tbody>
