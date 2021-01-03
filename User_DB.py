@@ -41,12 +41,16 @@ class Users(Base):
     user_id = Column(String, primary_key=True)
     name = Column(String)     
     admin = Column(Integer)
+    n_videos =  Column(Integer)
+    n_views =  Column(Integer)
+    n_questions =  Column(Integer)
+    n_answers = Column(Integer)
     
     def __repr__(self):
-        return "<User (id=%s name='%s', admin='%d'>" % (
-                                self.user_id, self.name, self.admin)
+        return "<User (id=%s, name=%s, admin=%d, n_videos=%d, n_views=%d, n_questions=%d, n_answers=%d>" % (
+                                self.user_id, self.name, self.admin, self.n_videos, self.n_views, self.n_questions, self.n_answers)
     def to_dictionary(self):
-        return {"user_id": self.user_id, "name": self.name, "admin": self.admin}
+        return {"user_id": self.user_id, "name": self.name, "admin": self.admin, "n_videos": self.n_videos, "n_views": self.n_views, "n_questions": self.n_questions, "n_answers": self.n_answers}
     
 
 Base.metadata.create_all(engine) #Create tables for the data models
@@ -102,7 +106,21 @@ def getUser(id):
     session.close()
     return U
 
+def video_inc(id):
+    user = session.query(Users).filter(Users.user_id==id).first()
+    user.n_videos = user.n_videos + 1     #+= can create race condition
+    session.commit()
 
+def question_inc(id):
+    user = session.query(Users).filter(Users.user_id==id).first()
+    user.n_questions = user.n_questions + 1     #+= can create race condition
+    session.commit()
+
+def answers_inc(id):
+    user = session.query(Users).filter(Users.user_id==id).first()
+    user.n_answers = user.n_answers + 1     #+= can create race condition
+
+    session.commit()
 
 if __name__ == "__main__":
     pass

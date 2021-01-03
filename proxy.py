@@ -117,6 +117,7 @@ def createNewVideo():
         data = resp.json() 
         print(resp.json())
         ret = newVideo(j["description"], j['url'],data['username'])
+        video_inc(data['username'])  #incremets the number of videos by this user
     except:
         abort(400)
         #the arguments were incorrect
@@ -156,6 +157,7 @@ def createNewQuestion(id):
         data = resp.json() 
         print(resp.json())
         ret = newQuestion(j["time"], j['description'],id,data['username'])
+        question_inc(data['username']) #incremets the number of questions by this user
     except:
         abort(400)
         #the arguments were incorrect
@@ -193,6 +195,7 @@ def createNewAnswer(Vid,Qid):
         data = resp.json() 
         print(resp.json())
         ret = newAnswer(j["description"], Qid,data['username'])
+        answers_inc(data['username'])   #incremets the number of questions by this user
     except:
         abort(400)
         #the arguments were incorrect
