@@ -28,45 +28,15 @@ class YTVideo(Base):
     description = Column(String)
     url = Column(String)
     views = Column(Integer, default = 0)
+    user= Column(String)
     
-    questions = relationship("Question", back_populates = "YTVideo")
-    
-    def __repr__(self):
-        return "<YouTubeVideo (id=%d Description=%s, URL=%s, Views=%s>" % (
-                                self.id, self.description, self.url,  self.views)
-    def to_dictionary(self):
-        return {"video_id": self.id, "description": self.description, "url": self.url, "views": self.views}
-    
-class Question(Base):
-    __tablename__ = 'Question'
-    id = Column(Integer, primary_key=True)
-    description = Column(String)
-    time = Column(Integer)
-    
-    video_id = Column(Integer, ForeignKey('YTVideo.id')) 
-    YTVideo = relationship("YTVideo", back_populates="questions")
-    
-    answers = relationship("Answer", back_populates="question")
+    #questions = relationship("Question", back_populates = "YTVideo")
     
     def __repr__(self):
-        return "<Question (id=%d Description='%s', time='%d', videoID=%d>" % (
-                                self.id, self.description, self.time, self.video_id)
+        return "<YouTubeVideo (id=%d Description=%s, URL=%s, Views=%s, user=%s>" % (
+                                self.id, self.description, self.url,  self.views, self.user)
     def to_dictionary(self):
-        return {"question_id": self.id, "description": self.description, "time": self.time, "video":self.video_id}
-    
-class Answer(Base):
-    __tablename__ = 'Answer'
-    id = Column(Integer, primary_key=True)
-    description = Column(String)
-    
-    question_id = Column(Integer, ForeignKey('Question.id')) 
-    question = relationship("Question", back_populates="answers")
-    
-    def __repr__(self):
-        return "<Answer (id=%d Description='%s', questionID=%d>" % (
-                                self.id, self.description,self.question_id)
-    def to_dictionary(self):
-        return {"answer_id": self.id, "description": self.description, "question":self.question_id}
+        return {"video_id": self.id, "description": self.description, "url": self.url, "views": self.views, "user":self.user}
     
 
 Base.metadata.create_all(engine) #Create tables for the data models
@@ -74,54 +44,6 @@ Base.metadata.create_all(engine) #Create tables for the data models
 Session = sessionmaker(bind=engine)
 session = scoped_session(Session)
 #session = Session()
-
-def getNumberOfQuestionsByVideo(videoID):
-    questions = getQuestionsfromVideo(videoID)
-    return len(questions)
-
-def getAnswersfromQuestion(questionID):
-    question = session.query(Question).filter(Question.id==questionID).first()
-    return question.answers
-
-def getAnswersfromQuestionDICT(questionID):
-    ret_list = []
-    lb = getAnswersfromQuestion(questionID)
-    for a in lb:
-        ret_list.append(a.to_dictionary())
-    return ret_list
-
-def newAnswer(description,qID):
-    a = Answer(description = description, question_id = qID)
-    try:
-        session.add(a)
-        session.commit()
-        print(a.id)
-        session.close()
-        return a.id
-    except:
-        return None
-
-def getQuestionsfromVideo(videoID):
-    video = session.query(YTVideo).filter(YTVideo.id==videoID).first()
-    return video.questions
-
-def getQuestionsfromVideoDICT(videoID):
-    ret_list = []
-    lb = getQuestionsfromVideo(videoID)
-    for b in lb:
-        ret_list.append(b.to_dictionary())
-    return ret_list
-
-def newQuestion(time , description,vID):
-    q = Question(description = description, time = time, video_id = vID)
-    try:
-        session.add(q)
-        session.commit()
-        print(q.id)
-        session.close()
-        return q.id
-    except:
-        return None
 
 def listVideos():
     return session.query(YTVideo).all()
@@ -154,14 +76,14 @@ def newVideoView(id):
     return n
 
 
-def newVideo(description , url):
-    vid = YTVideo(description = description, url = url)
+def newVideo(description , url,user):
+    vid = YTVideo(description = description, url = url, user=user)
     try:
         session.add(vid)
         session.commit()
         print(vid.id)
         session.close()
-        return vid.id
+        return vid.to_dictionary()
     except:
         return None
 

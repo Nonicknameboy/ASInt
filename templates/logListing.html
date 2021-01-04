@@ -1,0 +1,15 @@
+<!doctype html>
+<title>LIST OF LOGS</title>
+<body>
+    {% block content %}
+    <h3> List of logs</h3>
+        <div>
+            <ul>
+            {% for log in logs %}
+            <li>date:{{ log["date"]}}  |  {{ log["description"]}}</li>
+            {% endfor %}
+            </ul>
+        </form>
+        </div>
+    {% endblock %}
+</body>
